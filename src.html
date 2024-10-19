@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fake News Chatbot</title>
+    <style>
+        body {
+            background-color: rgb(45, 45, 48);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;  /* Full height */
+            margin: 0;      /* Remove default margin */
+            font-family: Arial, sans-serif;  /* Font style */
+            color:whitesmoke;
+        }
+
+        #response {
+            flex: 1;  /* Allow this div to grow and fill the space */
+            padding: 10px;
+            border: 1px solid #ccc;  /* Optional: add border */
+            overflow-y: auto;  /* Allow scrolling if content overflows */
+        }
+
+        #input-container {
+            display: flex;  /* Use flexbox for the input container */
+            padding: 10px;  /* Add padding */
+            background-color: rgb(45, 45, 48);  /* Background color for input area */
+            border-top: 1px rgb(45, 45, 48);  /* Optional: add top border */
+        }
+
+        #user-input {
+            flex: 1;  /* Allow input field to grow */
+            padding: 10px;  /* Add padding */
+            border: 1px solid rgb(45, 45, 48);  /* Border for input field */
+            border-radius: 5px;  /* Rounded corners */
+        }
+
+        button {
+            padding: 10px 15px;  /* Add padding for button */
+            margin-left: 10px;  /* Space between input and button */
+            border: none;  /* Remove default border */
+            background-color: rgb(45, 45, 48);  /* Button color */
+            color: whitesmoke;  /* Text color */
+            border-radius: 5px;  /* Rounded corners */
+            cursor: pointer;  /* Pointer cursor on hover */
+        }
+
+        button:hover {
+            background-color: #0056b3;  /* Darken button color on hover */
+        }
+    </style>
+</head>
+<body>
+    <h1 style="text-align: center;">Fake News Detection Chatbot</h1>
+    <div id="response"></div>  <!-- Container for responses -->
+
+    <div id="input-container">
+        <input type="text" id="user-input" placeholder="Type your message...">
+        <button onclick="sendMessage()">Send</button>
+    </div>
+
+    <script>
+        async function sendMessage() {
+    const userInput = document.getElementById('user-input').value;
+    const responseDiv = document.getElementById('response');
+
+    try {
+        const response = await fetch('/predict', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ text: userInput }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        responseDiv.innerHTML += `<p><strong>You:</strong> ${userInput}</p>`;
+        responseDiv.innerHTML += `<p><strong>Prediction:</strong> ${result.prediction}</p>`;
+
+    } catch (error) {
+        console.error('Fetch error:', error);  // Log the error
+        responseDiv.innerHTML += `<p><strong>Error:</strong> ${error.message}</p>`;
+    }
+
+    // Clear the input field
+    document.getElementById('user-input').value = '';
+    // Scroll to the bottom of the response div
+    responseDiv.scrollTop = responseDiv.scrollHeight;
+}
+
+    </script>
+    
+</body>
+</html>
